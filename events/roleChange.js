@@ -5,7 +5,7 @@ function isNewBurner(oldMember, newMember) {
     // Has Burner role in new, not in old
     const addedRoles = newMember.roles.cache.filter(role => !oldMember.roles.cache.has(role.id));
 
-    const found = addedRoles.find(r => r.name === "test");
+    const found = addedRoles.find(r => r.name === "Burner");
 
     return !!found;
 }
