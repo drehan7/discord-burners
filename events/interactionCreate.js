@@ -20,12 +20,14 @@ module.exports = {
         const timestamps = cooldowns.get(command.data.name);
         const defaultCooldownDuration = 3;
         const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1000;
+	
+	await interaction.deferReply();
 
         if (timestamps.has(interaction.user.id)) {
             const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
             if (now < expirationTime) {
                 const expiredTimestamp = Math.round(expirationTime / 1000);
-                return interaction.reply({
+                return await interaction.editReply({
                     content: `Please wait, you are on cooldownf or \`${command.data.name}\`. You can use it again at <t:${expiredTimestamp}:R>.`,
                     flags: MessageFlags.Ephemeral,
                });
