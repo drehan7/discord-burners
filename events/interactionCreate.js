@@ -3,11 +3,16 @@ const { Events, MessageFlags, Collection } = require('discord.js');
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
+	    	console.log("Start function at: ", Date.now());
         if (!interaction.isChatInputCommand()) return;
 	try {
+		console.log("start defer at: ", Date.now());
 		await interaction.deferReply();
+		console.log("deferred at: ", Date.now());
 	} catch (err) {
+		console.log('defer failed at: ', Date.now());
 		console.log('Could not defer reply, error: ', err);
+		return;
 	}
 
         const command = interaction.client.commands.get(interaction.commandName);
