@@ -4,7 +4,11 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
         if (!interaction.isChatInputCommand()) return;
-	await interaction.deferReply();
+	try {
+		await interaction.deferReply();
+	} catch (err) {
+		console.log('Could not defer reply, error: ', err);
+	}
 
         const command = interaction.client.commands.get(interaction.commandName);
         if (!command) {
