@@ -4,6 +4,7 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
         if (!interaction.isChatInputCommand()) return;
+	await interaction.deferReply();
 
         const command = interaction.client.commands.get(interaction.commandName);
         if (!command) {
@@ -11,6 +12,7 @@ module.exports = {
             return;
         }
 
+	    /*
         const { cooldowns } = interaction.client;
         if (!cooldowns.has(command.data.name)) {
             cooldowns.set(command.data.name, new Collection());
@@ -18,29 +20,34 @@ module.exports = {
 
         const now = Date.now();
         const timestamps = cooldowns.get(command.data.name);
-        const defaultCooldownDuration = 3;
+        const defaultCooldownDuration = 5;
         const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1000;
 	
-	await interaction.deferReply();
 
         if (timestamps.has(interaction.user.id)) {
             const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
             if (now < expirationTime) {
                 const expiredTimestamp = Math.round(expirationTime / 1000);
-                return await interaction.editReply({
-                    content: `Please wait, you are on cooldownf or \`${command.data.name}\`. You can use it again at <t:${expiredTimestamp}:R>.`,
-                    flags: MessageFlags.Ephemeral,
-               });
+		try {
+			return await interaction.reply({
+			    content: `Please wait, you are on cooldownf or \`${command.data.name}\`. You can use it again at <t:${expiredTimestamp}:R>.`,
+			    flags: MessageFlags.Ephemeral,
+		       });
+		} catch (err) {
+			console.log("Error: ", err);
+			return;
+		}
             }
         }
 
         timestamps.set(interaction.user.id, now);
         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
+*/
 
         try {
             await command.execute(interaction);
         } catch (err) {
-            console.error(err);
+            console.error("ERROR:", err);
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp({
                     content: `There was an error while executing this command!`,

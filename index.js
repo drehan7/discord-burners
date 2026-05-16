@@ -46,3 +46,8 @@ for (const file of eventFiles) {
 // Log in to Discord with your client's token
 client.login(token);
 
+process.on('SIGINT', () => {
+    console.log('Shutting down...');
+    client.destroy();
+    process.exit(0);
+});
