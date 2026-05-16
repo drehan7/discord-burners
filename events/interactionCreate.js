@@ -4,6 +4,7 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
         if (!interaction.isChatInputCommand()) return;
+	await interaction.deferReply();
 
         const command = interaction.client.commands.get(interaction.commandName);
         if (!command) {
@@ -11,6 +12,7 @@ module.exports = {
             return;
         }
 
+	    /*
         const { cooldowns } = interaction.client;
         if (!cooldowns.has(command.data.name)) {
             cooldowns.set(command.data.name, new Collection());
@@ -40,8 +42,8 @@ module.exports = {
 
         timestamps.set(interaction.user.id, now);
         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
+*/
 
-	await interaction.deferReply();
         try {
             await command.execute(interaction);
         } catch (err) {
