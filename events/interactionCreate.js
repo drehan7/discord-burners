@@ -1,19 +1,48 @@
-const { Events, MessageFlags, Collection } = require('discord.js');
+const { Events, MessageFlags, Collection, ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle } = require('discord.js');
+
+const handleButton = async (interaction) => {
+    if (interaction && interaction.customId === 'button1') {
+        const modal = new ModalBuilder()
+            .setCustomId('myModal')
+            .setTitle('My Awesome Modal');
+
+        const favoriteColorInput = new TextInputBuilder()
+            .setCustomId('favoriteColorInput')
+            .setLabel("What's your favorite color?")
+            .setStyle(TextInputStyle.Short);
+
+        // Action rows can only hold ONE text input each in modals
+        const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
+
+        modal.addComponents(firstActionRow);
+
+        console.log('before show modal');
+        await interaction.showModal(modal);
+    }
+}
 
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
-	    	console.log("Start function at: ", Date.now());
+        if (interaction.isButton()) {
+            console.log('HERE IS BUTTON');
+            return handleButton(interaction);
+        }
         if (!interaction.isChatInputCommand()) return;
-	try {
-		console.log("start defer at: ", Date.now());
-		await interaction.deferReply();
-		console.log("deferred at: ", Date.now());
-	} catch (err) {
-		console.log('defer failed at: ', Date.now());
-		console.log('Could not defer reply, error: ', err);
-		return;
-	}
+
+	    console.log("Start function at: ", Date.now());
+        try {
+            console.log("start defer at: ", Date.now());
+            if (!interaction.deferred) {
+                await interaction.deferReply();
+                console.log("deferred at: ", Date.now());
+            }
+        } catch (err) {
+            console.log('defer failed at: ', Date.now());
+            console.log('Could not defer reply, error: ', err);
+            return;
+        }
+
 
         const command = interaction.client.commands.get(interaction.commandName);
         if (!command) {
@@ -21,37 +50,6 @@ module.exports = {
             return;
         }
 
-	    /*
-        const { cooldowns } = interaction.client;
-        if (!cooldowns.has(command.data.name)) {
-            cooldowns.set(command.data.name, new Collection());
-        }
-
-        const now = Date.now();
-        const timestamps = cooldowns.get(command.data.name);
-        const defaultCooldownDuration = 5;
-        const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1000;
-	
-
-        if (timestamps.has(interaction.user.id)) {
-            const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
-            if (now < expirationTime) {
-                const expiredTimestamp = Math.round(expirationTime / 1000);
-		try {
-			return await interaction.reply({
-			    content: `Please wait, you are on cooldownf or \`${command.data.name}\`. You can use it again at <t:${expiredTimestamp}:R>.`,
-			    flags: MessageFlags.Ephemeral,
-		       });
-		} catch (err) {
-			console.log("Error: ", err);
-			return;
-		}
-            }
-        }
-
-        timestamps.set(interaction.user.id, now);
-        setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
-*/
 
         try {
             await command.execute(interaction);
