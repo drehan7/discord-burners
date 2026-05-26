@@ -1,4 +1,6 @@
-FROM docker.io/arm32v7/node:20-alpine
+ARG NODE_IMAGE=node:20-alpine
+
+FROM ${NODE_IMAGE}
 
 WORKDIR /usr/src/app
 
@@ -8,6 +10,8 @@ RUN ls -la
 
 RUN npm ci --only=production
 
+RUN npm install -g pm2
+
 COPY . .
 
-CMD ["node", "index.js"]
+CMD ["pm2-runtime", "index.js"]
