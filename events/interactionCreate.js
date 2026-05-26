@@ -25,7 +25,6 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
         if (interaction.isButton()) {
-            console.log('HERE IS BUTTON');
             return handleButton(interaction);
         }
         if (!interaction.isChatInputCommand()) return;
@@ -38,6 +37,9 @@ module.exports = {
                 console.log("deferred at: ", Date.now());
             }
         } catch (err) {
+	    if (err.code === 10062) {
+		return;
+	    }
             console.log('defer failed at: ', Date.now());
             console.log('Could not defer reply, error: ', err);
             return;
